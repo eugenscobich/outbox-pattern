@@ -1,0 +1,7 @@
+spring:
+  datasource:
+    username: user_iot_service
+    password: password_user_iot_service
+  flyway:
+    user: user_migration_iot_service
+    password: password_user_migration_iot_service

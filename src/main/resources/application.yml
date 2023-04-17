@@ -1,4 +1,18 @@
 spring:
+  datasource:
+    url: jdbc:postgresql://${DATABASE_HOST}:5432/${DATABASE_NAME}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_schema: schema_iot_service
+  flyway:
+    schemas: ${spring.jpa.properties.hibernate.default_schema}
+    placeholders:
+      springJpaPropertiesHibernateDefaultSchema: ${spring.jpa.properties.hibernate.default_schema}
+      springDatasourceUsername: ${spring.datasource.username}
+      springDatasourcePassword: ${spring.datasource.password}
   security:
     user:
       name: user
