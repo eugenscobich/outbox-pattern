@@ -1,0 +1,44 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+
+participant "Master 1"  as master1
+participant "Slave 1"  as slave1
+participant "Slave 2"  as slave2
+participant "Slave 3"  as slave3
+participant "Slave 4"  as slave4
+participant "Slave 5"  as slave5
+participant "Slave 6"  as slave6
+participant "Slave 7"  as slave7
+participant "Master 2"  as master2
+
+master1 -> master1: Power On
+master1 -> master1: Blink LED with interval 1s
+master1 -> master1: Set RX Channel 1
+master1 -> master1: Set Pipe 0 address to 0x0101010101
+master1 -> master1: Set Pipe 1 to 5 address that are registered in memory
+master1 -> master1: Set RX Mode
+master1 -> master1: Wait for 1min
+
+slave1 -> slave1: Power On
+slave1 -> slave1: Check if master address exists, and it is different then 0x0101010101
+slave1 -> slave1: If address in missing
+slave1 -> slave1: Set TX Channel 1
+slave1 -> slave1: Set TX Address to 0x0101010101
+slave1 -> slave1: Set Pipe 0 address to 0x0101010101
+slave1 -> slave1: Create 32 byte payload where first bytes are RegisterToNetwork command 0x00,\nsecond byte will contain slave address 0x0101010103
+slave1 -> slave1: Set TX Mode
+slave1 -> master1: Transmit packet
+master1 --> slave1: ack
+slave1 -> slave1: Move to RX mode with address 0x0101010103
+master1 -> master1: Check if master has slot to remember new slave
+master1 -> master1: Check if master has slot to remember new slave
+master1 -> master1: Move to TX mode with address 0x0101010103 and pipe0 = 0x0101010103
+master1 -> master1: Prepare 32 bytes payload,
+
+
+
+
+
+@enduml

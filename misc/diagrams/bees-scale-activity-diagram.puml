@@ -1,0 +1,73 @@
+@startuml
+'https://plantuml.com/activity-diagram-beta
+
+start
+#pink:Power On/Wake Up;
+#pink:Set Master id 0x0101010102;
+if (Master is waked up by alarm) then (true)
+    if (LED is enabled) then (true)
+        #pink:1. Start Blink Green LED with interval 100ms;
+    else
+    endif
+    repeat :For each Registered Address;
+        #pink:1. Set Chanel 1
+        2. Set TX Address and pipe0 = address of master 0x0101010102
+        3. Prepare packet with CMD = GET_DATA(0x01) Current time = 0x103000, Next Alarm = 0x104000, LED enabled
+        4. Set TX Mode
+        5. Send Packet;
+        #palegreen:Send Ack;
+    repeat while (more registered addresses?) is (yes)
+    #pink:1. Move to RX Mode
+    2. Set pipe0-5 addresses;
+    #pink:Go to Standby;
+
+    #palegreen:1. Wake Up by IRQ RX event
+    2. Save Time and Alarm
+    3. Read sensors
+    4. Move to TX mode with slave address 0x010101011A
+    5. Send Packet and wait for ack;
+    if (Ack is not retrieved) then (true)
+        if (LED is enabled) then (true)
+            #palegreen:Blink Red LED with interval 500ms for 5 sec;
+        else
+        endif
+    else (false)
+    endif
+    #palegreen:Go to Standby;
+elseif (Master is waked up by IRQ wake up) then (true)
+
+else (false)
+endif
+
+#pink:1. Start Blink LED with interval 1s
+2. Set Chanel 1
+3. Set RX pipe0 = 0x0101010101
+4. Set RX Mode
+5. Wait for 60000 milliseconds;
+#palegreen:Power On Slave with id 0x010101011A;
+note right
+  Check if master is registered and differ from 0x0101010101
+end note
+if (Master address is registered) then (true)
+    #palegreen:1. Configure RX with pipe0 = master address (for example 0x0101010102)
+    2. Go Standby and wait for IRQ wake up event;
+else (false)
+    #palegreen:1. Start Blink LED with interval 1s
+    2. Set Channel = 1
+    3. Set TX Address and pipe0 = 0x0101010101
+    4. Prepare packet with CMD = REGISTER_TO_NETWORK(0x00) and Address = 0x010101011A
+    5. Set TX Mode;
+    #palegreen:Transmit Packet;
+    if (Not Success and Max number of retransmits is reached) then (true)
+        #palegreen:1. Start Blink LED with interval 200ms;
+    else (false)
+        #pink:Receive Packet and send ack;
+        #palegreen:1. Start Blink LED with interval 1s
+        2. Check ;
+    endif
+endif
+
+
+stop
+
+@enduml

@@ -1,0 +1,50 @@
+SIM800C Test Internet connection
+https://www.aeq-web.com/sim800-gprs-http-post-get-request-at-commands/?lang=en
+
+
+[AT+SAPBR=3,1,Contype,"GPRS"]
+This command sets the GPRS connection parameter in the SIM800.
+[AT+SAPBR=3,1,APN,"APN"]
+This command writes the APN parameter to the SIM800. The APN (Access Point Name) is the access point (gateway) in the mobile network. The APN can usually be found on the providers website.
+[AT+SAPBR=3,1,USER,"Username"]
+This command writes the APN username to the SIM800. Note: Some mobile networks or APN do not require a username. In this case this AT command can be omitted completely.
+[AT+SAPBR=3,1,PWD,"Password"]
+This command writes the APN password to the SIM800. Note: Some mobile networks or APN do not require a password. In this case this AT command can be omitted completely.
+
+[AT+SAPBR=1,1]
+This command opens the carrier with the previously defined parameters. This can be seen as the start command for GPRS.
+
+[AT+SAPBR=2,1]
+This command queries the status of the previously opened GPRS carrier and is only for diagnostic purposes.
+
+[AT+SAPBR=0,1]
+This command terminates the GRPS carrier and is only executed after the data transfer.
+
+
+[AT+HTTPINIT]
+This command initializes the HTTP service. The SIM800 will be informed that an HTTP request starts.
+
+[AT+HTTPPARA=CID,"1"]
+This command defines the carrier profile. Usually this is always 1.
+
+[AT+HTTPPARA=URL,"http://testserver.aeq-web.com/sim800_test/sim800.php"]
+This command passes the URL to be called. It is the same format as it is entered in a web browser. If the server is not running on port 80, the corresponding port is simply added to the end of the URL or IP. Examples: http://www.aeq-web.com or http://123.123.123.123 or http://url.com:8080
+
+[AT+HTTPPARA=CONTENT,application/x-www-form-urlencoded]
+This command defines the content type of the current request. The content type is only relevant for the web server. It tells which media type in the request will be sent to the server.
+
+[AT+HTTPDATA=192,10000]
+This command defines the size of the user data to be transferred in bytes. Here the following applies: Better a little more than too little, but also not too much. The value 192 bytes is usually sufficient to transfer a few parameters (e.g. measured values of a weather station). The second number indicates the time (milliseconds) in which the data must arrive before the SIM800 aborts the request. This depends on many factors (connection, server, amount of data ...) and can be a value between one and 120 seconds. Again, 10 seconds (10000 ms) is a generous value.
+
+[Postname=VALUE] (User data)
+Once the previous command has been sent, the SIM800 waits for the user data. The POST parameters can now be transferred to the SIM800 within the previously defined time window.
+
+[AT+HTTPACTION=1]
+With HTTPACTION the transfer method is defined. The following applies: 0=GET, 1=POST, 2=HEAD. The response includes the status code from the server and the data length.
+
+[AT+HTTPREAD]
+This command passes the URL to be called. User data are also received via this command, which can be evaluated by the microcontroller for further control settings.
+
+[AT+HTTPTERM]
+This command aborts a running HTTP request.
+
