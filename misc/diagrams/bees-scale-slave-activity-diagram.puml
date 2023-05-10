@@ -1,0 +1,108 @@
+@startuml
+'https://plantuml.com/activity-diagram-beta
+
+start
+:Power On/Wake Up;
+
+if (Does it have GSM module?) then (true)
+    :Operate as master;
+    :Set id 0x0101010103;
+    if (Is waked up by power) then (true)
+        :Start GSM if it is not started;
+        :Read configuration;
+        :Set TX ch=1 and TXaddr=0x0101010101, pipe0addr=0x0101010101;
+        :Set max interval for retransmit, max number of retransmission, max_retransmission_IRQ = true;
+        :Calculate next available ch and address;
+        :Send packet with CMD=REGISTER_TO_NETWORK with ch and address;
+        :Go to Standby;
+
+    elseif (Is waked up by IRQ wake up) then (true)
+        if (TX is enabled and Max number of retransmission is reached) then (true)
+            :Failure situation, this means master didn't reached any slave;
+            if (Time + 1min is not reached) then (true)
+                :Send packet with CMD=REGISTER_TO_NETWORK with ch and address (REUSE_TX_PL));
+                :Go to Standby;
+            else (false)
+            endif
+        elseif (TX is enabled for ch=1 and TXaddr=0x0101010101, pipe0addr=0x0101010101 and there is ack package) then (true)
+            :Read TX message;
+            :Read ACK message, save new address+ch for slave id (override slave_id configuration if it exist));
+            :Update configuration;
+        else (false)
+        endif
+    elseif (Is waked up by Alarm) then (true)
+        :Configure TX mode;
+        :Calculate next alarm;
+        repeat :For each Registered Address;
+            :1. Set Chanel 1
+            2. Set TX Address and pipe0 = registered address, ch according to registered address
+            3. Prepare packet with CMD = GET_DATA(0x01) Current time = 0x103000, Next Alarm = 0x104000, LED enabled
+            4. Set TX Mode
+            5. Send Packet
+            6. wait for TX akc package
+            7. read ack data and collect;
+        repeat while (more registered addresses?) is (yes)
+        :Send data to GSM;
+        :Set Alarm;
+        :Go to Standby;
+    else (false)
+    endif
+else (false)
+    :Operate as slave;
+    :Set id 0x0101010103;
+    if (Is waked up by power) then (true)
+        :Read configuration;
+        if (Button is presses? or Is configuration is missing?) then (true)
+            if (Is configuration is present?) then (true)
+            :Clear master communication channel and address;
+            else
+            endif
+            :Set RX ACK packet with slave id=0x0101010103, ch=1 and RXaddr=0x0101010101;
+            :Go to Standby;
+        else (false)
+            :Set RX channel and address according to configuration,
+            for example ch=2, address=0x010101011A;
+            :Set Alarm for +1min;
+            :Go to Standby;
+        endif
+    elseif (Is waked up by IRQ wake up) then (true)
+        if (RX is enabled and There is data for pipe=0, ch=1 and addr=0x0101010101) then (true)
+            :Read configuration, save ch use CMD=REGISTER_TO_NETWORK;
+            :Set RX channel and address according to configuration,
+            for example ch=2, address=0x010101011A;
+            :Set Alarm for +1min;
+            :Go to Standby;
+        elseif (RX is enabled and There is data for pipe=0, ch=2 and addr=0x010101011A (According to configuration)) then (true)
+            :Read RX message, update time and alarm, CMD=GET_DATA;
+            :Power off NRF24L01+;
+            :Go to Standby;
+        else (false)
+        endif
+    elseif (Is waked up by Alarm) then (true)
+        if (RX is enabled for pipe=0, ch=1 and addr=0x0101010101) then (true)
+            :Failure situation, this means master didn't transmit TX packet with REGISTER_TO_NETWORK CMD;
+            :Blink LED 4 times;
+            :Do not change RX settings;
+            :Set Alarm for +1min;
+            :Go to Standby;
+        elseif (RX is enabled for pipe=0, ch=2 and addr=0x0101010103 (According to configuration)) then (true)
+            :Failure situation, this means master didn't transmit TX packet with GET_DATA CMD;
+            :Blink LED 3 times;
+            :Do not change RX settings;
+            :Set Alarm for +1min;
+            :Go to Standby;
+         elseif (NRF24L01+ is power down) then (true)
+            :Read sensors data;
+            :Prepare ACK package;
+            :Set RX channel according to configuration and id of slave,
+            for example ch=2, address=0x0101010103;
+            :Set Alarm for +1min;
+            :Go to Standby;
+        else (false)
+        endif
+    else (false)
+    endif
+endif
+stop
+
+@enduml
