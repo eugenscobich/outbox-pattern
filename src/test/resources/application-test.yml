@@ -1,7 +1,11 @@
 spring:
   datasource:
-    username: user_iot_service
-    password: password_user_iot_service
+    username: user_outbox_pattern_service
+    password: password_user_outbox_pattern_service
   flyway:
-    user: user_migration_iot_service
-    password: password_user_migration_iot_service
+    user: user_migration_outbox_pattern_service
+    password: password_user_migration_outbox_pattern_service
+
+logging:
+  level:
+    com.eugenescobich: DEBUG

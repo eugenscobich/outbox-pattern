@@ -1,4 +1,4 @@
-package com.eugenescobich.iot.initializer;
+package com.eugenescobich.outbox.pattern.initializer;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.test.util.TestPropertyValues;
@@ -11,9 +11,11 @@ public class TestApplicationContextInitializer implements ApplicationContextInit
 
     public void initialize(ConfigurableApplicationContext configurableApplicationContext) {
         PostgreSQLContainer postgreSQLContainer = (PostgreSQLContainer) new PostgreSQLContainer("postgres:14")
-                .withDatabaseName("db_iot_service")
+                .withDatabaseName("db_outbox_pattern_service")
                 .withInitScript("db/db_init.sql")
-                .withCommand("postgres", "-c", "log_statement=all");
+                .withCommand("postgres"
+                    //, "-c", "log_statement=all"
+                );
 
         postgreSQLContainer.start();
         log.info("Postgres Url: {}", postgreSQLContainer.getJdbcUrl());

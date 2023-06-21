@@ -8,11 +8,11 @@
 		<version>3.1.0-SNAPSHOT</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.euegnescobich.iot</groupId>
-	<artifactId>iot-service</artifactId>
+	<groupId>com.euegnescobich</groupId>
+	<artifactId>outbox-pattern</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Iot Service</name>
-	<description>Iot Spring Boot Service</description>
+	<name>Outbox Pattern Test Service</name>
+	<description>Outbox Pattern Test Service</description>
 	<properties>
 		<java.version>17</java.version>
 		<testcontainers.version>1.17.6</testcontainers.version>
@@ -29,11 +29,6 @@
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

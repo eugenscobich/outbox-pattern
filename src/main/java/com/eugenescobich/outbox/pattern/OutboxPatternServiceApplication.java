@@ -1,13 +1,13 @@
-package com.eugenescobich.iot;
+package com.eugenescobich.outbox.pattern;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class IotServiceApplication {
+public class OutboxPatternServiceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(IotServiceApplication.class, args);
+		SpringApplication.run(OutboxPatternServiceApplication.class, args);
 	}
 
 }

@@ -1,12 +1,15 @@
 spring:
   datasource:
     url: jdbc:postgresql://${DATABASE_HOST}:5432/${DATABASE_NAME}
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 20
   jpa:
     hibernate:
       ddl-auto: validate
     properties:
       hibernate:
-        default_schema: schema_iot_service
+        default_schema: schema_outbox_pattern_service
   flyway:
     schemas: ${spring.jpa.properties.hibernate.default_schema}
     placeholders:
